@@ -233,6 +233,12 @@ static inline bool pm_wakeup_pending(void) { return false; }
 static inline void lock_system_sleep(void) {}
 static inline void unlock_system_sleep(void) {}
 
+#endif /* !CONFIG_PM_SLEEP */
+
+#ifdef CONFIG_PM_SLEEP_DEBUG
+extern bool pm_print_times_enabled;
+#else
+#define pm_print_times_enabled	(false)
 #endif 
 
 #ifdef CONFIG_ARCH_SAVE_PAGE_KEYS
