@@ -31,6 +31,7 @@ struct cpuidle_driver;
 struct cpuidle_state_usage {
 	void		*driver_data;
 
+	unsigned long long	disable;
 	unsigned long long	usage;
 	unsigned long long	time; 
 };
@@ -40,10 +41,9 @@ struct cpuidle_state {
 	char		desc[CPUIDLE_DESC_LEN];
 
 	unsigned int	flags;
-	unsigned int	exit_latency; 
-	int		power_usage; 
-	unsigned int	target_residency; 
-	unsigned int    disable;
+	unsigned int	exit_latency; /* in US */
+	int		power_usage; /* in mW */
+	unsigned int	target_residency; /* in US */
 
 	int (*enter)	(struct cpuidle_device *dev,
 			struct cpuidle_driver *drv,
