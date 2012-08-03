@@ -301,7 +301,7 @@ void store_cpu_topology(unsigned int cpuid)
 		cpu_topology[cpuid].socket_id, mpidr);
 }
 
-void init_cpu_topology(void)
+void __init init_cpu_topology(void)
 {
 	unsigned int cpu;
 
