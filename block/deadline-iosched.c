@@ -14,20 +14,20 @@
 #include <linux/compiler.h>
 #include <linux/rbtree.h>
 
-static const int read_expire = HZ / 2;  
-static const int write_expire = 5 * HZ; 
-static const int writes_starved = 2;    
-static const int fifo_batch = 16;       
+static const int read_expire = HZ / 2;
+static const int write_expire = 5 * HZ;
+static const int writes_starved = 2;
+static const int fifo_batch = 16;
 
 struct deadline_data {
 
-	struct rb_root sort_list[2];	
+	struct rb_root sort_list[2];
 	struct list_head fifo_list[2];
 
 	struct request *next_rq[2];
-	unsigned int batching;		
-	sector_t last_sector;		
-	unsigned int starved;		
+	unsigned int batching;
+	sector_t last_sector;
+	unsigned int starved;
 
 	int fifo_expire[2];
 	int fifo_batch;
@@ -172,7 +172,7 @@ static inline int deadline_check_fifo(struct deadline_data *dd, int ddir)
 {
 	struct request *rq = rq_entry_fifo(dd->fifo_list[ddir].next);
 
-	if (time_after(jiffies, rq_fifo_time(rq)))
+	if (time_after_eq(jiffies, rq_fifo_time(rq)))
 		return 1;
 
 	return 0;
@@ -192,7 +192,7 @@ static int deadline_dispatch_requests(struct request_queue *q, int force)
 		rq = dd->next_rq[READ];
 
 	if (rq && dd->batching < dd->fifo_batch)
-		
+
 		goto dispatch_request;
 
 
