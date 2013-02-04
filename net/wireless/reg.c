@@ -1861,22 +1861,32 @@ static int __set_regdom(const struct ieee80211_regdomain *rd)
 
 	if (last_request->initiator != NL80211_REGDOM_SET_BY_COUNTRY_IE) {
 
-		intersected_rd = regdom_intersect(rd, cfg80211_regdomain);
-		if (!intersected_rd)
-			return -EINVAL;
+                intersected_rd = regdom_intersect(rd, cfg80211_regdomain);
+                if (!intersected_rd)
+                        return -EINVAL;
 
-		if (last_request->initiator == NL80211_REGDOM_SET_BY_DRIVER)
-			request_wiphy->regd = rd;
-		else
-			kfree(rd);
+                /*
+                 * We can trash what CRDA provided now.
+                 * However if a driver requested this specific regulatory
+                 * domain we keep it for its private use
+                 */
+                if (last_request->initiator == NL80211_REGDOM_SET_BY_DRIVER) {
+                        const struct ieee80211_regdomain *tmp;
 
-		rd = NULL;
+                        tmp = request_wiphy->regd;
+                        request_wiphy->regd = rd;
+                        kfree(tmp);
+                } else {
+                        kfree(rd);
+                }
 
-		reset_regdomains(false);
-		cfg80211_regdomain = intersected_rd;
+                rd = NULL;
 
-		return 0;
-	}
+                reset_regdomains(false);
+                cfg80211_regdomain = intersected_rd;
+
+                return 0;
+        }
 
 	if (!intersected_rd)
 		return -EINVAL;
