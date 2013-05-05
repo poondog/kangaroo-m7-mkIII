@@ -52,6 +52,7 @@ enum pageflags {
 	PG_kmalloc,			
 	PG_kgsl,
 #endif
+	PG_readahead,		/* page in a readahead window */
 	__NR_PAGEFLAGS,
 
 	
