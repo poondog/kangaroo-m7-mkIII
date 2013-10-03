@@ -87,6 +87,28 @@ TRACE_EVENT(credit_entropy_bits,
 		  (void *)__entry->IP)
 );
 
+TRACE_EVENT(push_to_pool,
+	TP_PROTO(const char *pool_name, int pool_bits, int input_bits),
+
+	TP_ARGS(pool_name, pool_bits, input_bits),
+
+	TP_STRUCT__entry(
+		__field( const char *,	pool_name		)
+		__field(	  int,	pool_bits		)
+		__field(	  int,	input_bits		)
+	),
+
+	TP_fast_assign(
+		__entry->pool_name	= pool_name;
+		__entry->pool_bits	= pool_bits;
+		__entry->input_bits	= input_bits;
+	),
+
+	TP_printk("%s: pool_bits %d input_pool_bits %d",
+		  __entry->pool_name, __entry->pool_bits,
+		  __entry->input_bits)
+);
+
 TRACE_EVENT(debit_entropy,
 	TP_PROTO(const char *pool_name, int debit_bits),
 
@@ -168,28 +190,6 @@ TRACE_EVENT(xfer_secondary_pool,
 		  "input_entropy %d", __entry->pool_name, __entry->xfer_bits,
 		  __entry->request_bits, __entry->pool_entropy,
 		  __entry->input_entropy)
-);
-
-TRACE_EVENT(push_to_pool,
-	TP_PROTO(const char *pool_name, int pool_bits, int input_bits),
-
-	TP_ARGS(pool_name, pool_bits, input_bits),
-
-	TP_STRUCT__entry(
-		__field( const char *,	pool_name		)
-		__field(	  int,	pool_bits		)
-		__field(	  int,	input_bits		)
-	),
-
-	TP_fast_assign(
-		__entry->pool_name	= pool_name;
-		__entry->pool_bits	= pool_bits;
-		__entry->input_bits	= input_bits;
-	),
-
-	TP_printk("%s: pool_bits %d input_pool_bits %d",
-		  __entry->pool_name, __entry->pool_bits,
-		  __entry->input_bits)
 );
 
 DECLARE_EVENT_CLASS(random__get_random_bytes,
@@ -313,3 +313,4 @@ TRACE_EVENT(urandom_read,
 
 /* This part must be outside protection */
 #include <trace/define_trace.h>
+
