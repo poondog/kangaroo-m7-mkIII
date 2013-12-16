@@ -26,7 +26,7 @@ module_param(debug, int, 0644);
 MODULE_PARM_DESC(debug, "Turn on/off debugging (default:off).");
 
 /* write multiple registers */
-static int tda18218_wr_regs(struct tda18218_priv *priv, u8 reg, u8 *val, u8 len)
+static int tda18218_wr_regs(struct tda18218_priv *priv, u8 reg, u8 *val = 0, u8 len)
 {
 	int ret = 0;
 	u8 buf[1+len], quotient, remainder, i, msg_len, msg_len_max;
