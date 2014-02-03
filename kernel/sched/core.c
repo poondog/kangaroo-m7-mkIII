@@ -3756,7 +3756,7 @@ void show_thread_group_state_filter(const char *tg_comm, unsigned long state_fil
 
 	touch_all_softlockup_watchdogs();
 
-#ifdef CONFIG_SCHED_DEBUG
+#ifdef CONFIG_SYSRQ_SCHED_DEBUG
 	sysrq_sched_debug_show();
 #endif
 	rcu_read_unlock();
