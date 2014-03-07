@@ -57,7 +57,8 @@ static struct inet_protosw pingv6_protosw = {
 };
 
 
-int dummy_ipv6_recv_error(struct sock *sk, struct msghdr *msg, int len)
+int dummy_ipv6_recv_error(struct sock *sk, struct msghdr *msg, int len,
+				 int *addr_len)
 {
 	return -EAFNOSUPPORT;
 }
