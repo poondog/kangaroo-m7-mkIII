@@ -1352,8 +1352,18 @@ static void __cpuinit rcu_prepare_kthreads(int cpu)
 
 #if !defined(CONFIG_RCU_FAST_NO_HZ)
 
-int rcu_needs_cpu(int cpu)
+/*
+ * Check to see if any future RCU-related work will need to be done
+ * by the current CPU, even if none need be done immediately, returning
+ * 1 if so.  This function is part of the RCU implementation; it is -not-
+ * an exported member of the RCU API.
+ *
+ * Because we not have RCU_FAST_NO_HZ, just check whether this CPU needs
+ * any flavor of RCU.
+ */
+int rcu_needs_cpu(int cpu, unsigned long *delta_jiffies)
 {
+	*delta_jiffies = ULONG_MAX;
 	return rcu_cpu_has_callbacks(cpu);
 }
 
@@ -1382,13 +1392,42 @@ static DEFINE_PER_CPU(struct hrtimer, rcu_idle_gp_timer);
 static ktime_t rcu_idle_gp_wait;	
 static ktime_t rcu_idle_lazy_gp_wait;	
 
-int rcu_needs_cpu(int cpu)
+/*
+ * Allow the CPU to enter dyntick-idle mode if either: (1) There are no
+ * callbacks on this CPU, (2) this CPU has not yet attempted to enter
+ * dyntick-idle mode, or (3) this CPU is in the process of attempting to
+ * enter dyntick-idle mode.  Otherwise, if we have recently tried and failed
+ * to enter dyntick-idle mode, we refuse to try to enter it.  After all,
+ * it is better to incur scheduling-clock interrupts than to spin
+ * continuously for the same time duration!
+ *
+ * The delta_jiffies argument is used to store the time when RCU is
+ * going to need the CPU again if it still has callbacks.  The reason
+ * for this is that rcu_prepare_for_idle() might need to post a timer,
+ * but if so, it will do so after tick_nohz_stop_sched_tick() has set
+ * the wakeup time for this CPU.  This means that RCU's timer can be
+ * delayed until the wakeup time, which defeats the purpose of posting
+ * a timer.
+ */
+static bool rcu_cpu_has_nonlazy_callbacks(int cpu);
+int rcu_needs_cpu(int cpu, unsigned long *delta_jiffies)
 {
-	
-	if (!rcu_cpu_has_callbacks(cpu))
+	/* If no callbacks, RCU doesn't need the CPU. */
+	if (!rcu_cpu_has_callbacks(cpu)) {
+		*delta_jiffies = ULONG_MAX;
 		return 0;
-	
-	return per_cpu(rcu_dyntick_holdoff, cpu) == jiffies;
+	}
+	if (per_cpu(rcu_dyntick_holdoff, cpu) == jiffies) {
+		/* RCU recently tried and failed, so don't try again. */
+		*delta_jiffies = 1;
+		return 1;
+	}
+	/* Set up for the possibility that RCU will post a timer. */
+	if (rcu_cpu_has_nonlazy_callbacks(cpu))
+		*delta_jiffies = RCU_IDLE_GP_DELAY;
+	else
+		*delta_jiffies = RCU_IDLE_LAZY_GP_DELAY;
+	return 0;
 }
 
 static bool __rcu_cpu_has_nonlazy_callbacks(struct rcu_data *rdp)
