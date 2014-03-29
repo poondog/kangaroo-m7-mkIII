@@ -30,6 +30,7 @@ export CROSS_COMPILE=${HOME}/repos/arm-cortex_a15-linux-gnueabihf-linaro_4.8.3-2
 # make .config
 env KCONFIG_NOTIMESTAMP=true \
 make ARCH=arm export SUBARCH=arm CROSS_COMPILE=arm-eabi- ${DEFCONFIG_FILE}
+make m7_defconfig
 
 # build the kernel
 
