@@ -1513,14 +1513,14 @@ static struct msm_bus_vectors hsic_max_vectors[] = {
        {
                .src = MSM_BUS_MASTER_SPS,
                .dst = MSM_BUS_SLAVE_EBI_CH0,
-               .ab = 60000000,         
-               .ib = 960000000,        
+               .ab = 60000000,		/* At least 480Mbps on bus. */
+	       .ib = 960000000,		/* MAX bursts rate */      
        },
        {
                .src = MSM_BUS_MASTER_SPS,
                .dst = MSM_BUS_SLAVE_SPS,
                .ab = 0,
-               .ib = 512000000, 
+               .ib = 512000000, /*vote for 64Mhz dfab clk rate*/
        },
 };
 
@@ -4038,7 +4038,7 @@ static struct platform_device msm_tsens_device = {
 static struct msm_thermal_data msm_thermal_pdata = {
 	.sensor_id = 0,
 	.poll_ms = 1000,
-	.limit_temp = 51,
+	.limit_temp = 60,
 	.temp_hysteresis = 10,
 	.limit_freq = 918000,
 };
@@ -4124,7 +4124,7 @@ static struct msm_rpmrs_level msm_rpmrs_levels[] = {
 		MSM_PM_SLEEP_MODE_WAIT_FOR_INTERRUPT,
 		MSM_RPMRS_LIMITS(ON, ACTIVE, MAX, ACTIVE),
 		true,
-		1, 784, 180000, 100,
+		1, 650, 180000, 100,
 	},
 
 	{
