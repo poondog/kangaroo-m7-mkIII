@@ -17,7 +17,7 @@ fi
 
 # Kernel Version
 BASE_VER=".KANGAROO"
-VER=".M7.v007"
+VER=".M7.v008"
 VER=$BASE_VER$VER
 
 # AK Variables
@@ -29,7 +29,7 @@ export CROSS_COMPILE=${HOME}/repos/arm-cortex_a15-linux-gnueabihf-linaro_4.8.3-2
 
 # make .config
 env KCONFIG_NOTIMESTAMP=true \
-make ARCH=arm export SUBARCH=arm CROSS_COMPILE=arm-eabi- ${DEFCONFIG_FILE}
+make ARCH=arm export SUBARCH=arm CROSS_COMPILE=arm-eabi-
 make m7_defconfig
 
 # build the kernel
