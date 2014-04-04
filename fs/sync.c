@@ -220,11 +220,10 @@ static int do_fsync(unsigned int fd, int datasync)
 {
 	struct file *file;
 	int ret = -EBADF;
-	int fput_needed;
 	struct fsync_work *fwork, *tmp;
 	
 
-	file = fget_light(fd, &fput_needed);
+	file = fget(fd);
 	if (file) {
 		ktime_t fsync_t, fsync_diff;
 		char pathname[256], *path;
@@ -272,7 +271,7 @@ static int do_fsync(unsigned int fd, int datasync)
 no_async:
 		fsync_t = ktime_get();
 		ret = vfs_fsync(file, datasync);
-		fput_light(file, fput_needed);
+		fput(file);
 		fsync_diff = ktime_sub(ktime_get(), fsync_t);
 		if (ktime_to_ms(fsync_diff) >= 5000) {
 			pr_info("VFS: %s pid:%d(%s)(parent:%d/%s) takes %lld ms to fsync %s.\n", __func__,
