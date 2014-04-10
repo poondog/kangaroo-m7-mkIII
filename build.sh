@@ -34,4 +34,4 @@ make m7_defconfig
 
 # build the kernel
 
-make -j3
+make -j4
