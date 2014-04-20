@@ -774,7 +774,6 @@ static inline unsigned int do_avg_nr_running(struct rq *rq)
 
 static inline void inc_nr_running(struct rq *rq)
 {
-	sched_update_nr_prod(cpu_of(rq), rq->nr_running, true);
 	write_seqcount_begin(&rq->ave_seqcnt);
 	rq->ave_nr_running = do_avg_nr_running(rq);
 	rq->nr_last_stamp = rq->clock_task;
@@ -784,8 +783,6 @@ static inline void inc_nr_running(struct rq *rq)
 
 static inline void dec_nr_running(struct rq *rq)
 {
-	sched_update_nr_prod(cpu_of(rq), rq->nr_running, false);
-	write_seqcount_begin(&rq->ave_seqcnt);
 	rq->ave_nr_running = do_avg_nr_running(rq);
 	rq->nr_last_stamp = rq->clock_task;
 	rq->nr_running--;
