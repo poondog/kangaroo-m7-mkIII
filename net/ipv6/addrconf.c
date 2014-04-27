@@ -826,7 +826,8 @@ retry:
 	                idev->nd_parms->retrans_time / HZ;
 	write_unlock(&idev->lock);
 
-	if (tmp_prefered_lft <= regen_advance) {
+	age = (now - tmp_tstamp + ADDRCONF_TIMER_FUZZ_MINUS) / HZ;
+	if (tmp_prefered_lft <= regen_advance + age) {
 		in6_ifa_put(ifp);
 		in6_dev_put(idev);
 		ret = -1;
