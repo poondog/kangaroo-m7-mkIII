@@ -352,7 +352,7 @@ CHECK		= sparse
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
 MODFLAGS        = -mtune=cortex-a15 -march=armv7-a -mfpu=neon \
-		  -ftree-vectorize -ffastmath \
+		  -ftree-vectorize -ffast-math \
 		  -fgcse-las \
                   -fpredictive-commoning
 CFLAGS_MODULE   = $(MODFLAGS)
