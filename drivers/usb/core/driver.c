@@ -718,7 +718,37 @@ void usb_forced_unbind_intf(struct usb_interface *intf)
 	intf->needs_binding = 1;
 }
 
-void usb_rebind_intf(struct usb_interface *intf)
+/*
+ * Unbind drivers for @udev's marked interfaces.  These interfaces have
+ * the needs_binding flag set, for example by usb_resume_interface().
+ *
+ * The caller must hold @udev's device lock.
+ */
+static void unbind_marked_interfaces(struct usb_device *udev)
+{
+	struct usb_host_config	*config;
+	int			i;
+	struct usb_interface	*intf;
+
+	config = udev->actconfig;
+	if (config) {
+		for (i = 0; i < config->desc.bNumInterfaces; ++i) {
+			intf = config->interface[i];
+			if (intf->dev.driver && intf->needs_binding)
+				usb_forced_unbind_intf(intf);
+		}
+	}
+}
+
+/* Delayed forced unbinding of a USB interface driver and scan
+ * for rebinding.
+ *
+ * The caller must hold @intf's device's lock, but not @intf's lock.
+ *
+ * Note: Rebinds will be skipped if a system sleep transition is in
+ * progress and the PM "complete" callback hasn't occurred yet.
+ */
+static void usb_rebind_intf(struct usb_interface *intf)
 {
 	int rc;
 
@@ -735,46 +765,13 @@ void usb_rebind_intf(struct usb_interface *intf)
 	}
 }
 
-#ifdef CONFIG_PM
-
-static void unbind_no_pm_drivers_interfaces(struct usb_device *udev)
-{
-	struct usb_host_config	*config;
-	int			i;
-	struct usb_interface	*intf;
-	struct usb_driver	*drv;
-
-	config = udev->actconfig;
-	if (config) {
-		for (i = 0; i < config->desc.bNumInterfaces; ++i) {
-			intf = config->interface[i];
-
-			if (intf->dev.driver) {
-				drv = to_usb_driver(intf->dev.driver);
-				if (!drv->suspend || !drv->resume)
-					usb_forced_unbind_intf(intf);
-			}
-		}
-	}
-}
-
-static void unbind_no_reset_resume_drivers_interfaces(struct usb_device *udev)
-{
-	struct usb_host_config	*config;
-	int			i;
-	struct usb_interface	*intf;
-
-	config = udev->actconfig;
-	if (config) {
-		for (i = 0; i < config->desc.bNumInterfaces; ++i) {
-			intf = config->interface[i];
-			if (intf->dev.driver && intf->needs_binding)
-				usb_forced_unbind_intf(intf);
-		}
-	}
-}
-
-static void do_rebind_interfaces(struct usb_device *udev)
+/*
+ * Rebind drivers to @udev's marked interfaces.  These interfaces have
+ * the needs_binding flag set.
+ *
+ * The caller must hold @udev's device lock.
+ */
+static void rebind_marked_interfaces(struct usb_device *udev)
 {
 	struct usb_host_config	*config;
 	int			i;
@@ -786,6 +783,48 @@ static void do_rebind_interfaces(struct usb_device *udev)
 			intf = config->interface[i];
 			if (intf->needs_binding)
 				usb_rebind_intf(intf);
+		}
+	}
+}
+
+/*
+ * Unbind all of @udev's marked interfaces and then rebind all of them.
+ * This ordering is necessary because some drivers claim several interfaces
+ * when they are first probed.
+ *
+ * The caller must hold @udev's device lock.
+ */
+void usb_unbind_and_rebind_marked_interfaces(struct usb_device *udev)
+{
+	unbind_marked_interfaces(udev);
+	rebind_marked_interfaces(udev);
+}
+
+#ifdef CONFIG_PM
+
+/* Unbind drivers for @udev's interfaces that don't support suspend/resume
+ * There is no check for reset_resume here because it can be determined
+ * only during resume whether reset_resume is needed.
+ *
+ * The caller must hold @udev's device lock.
+ */
+static void unbind_no_pm_drivers_interfaces(struct usb_device *udev)
+{
+	struct usb_host_config	*config;
+	int			i;
+	struct usb_interface	*intf;
+	struct usb_driver	*drv;
+
+	config = udev->actconfig;
+	if (config) {
+		for (i = 0; i < config->desc.bNumInterfaces; ++i) {
+			intf = config->interface[i];
+			
+			if (intf->dev.driver) {
+				drv = to_usb_driver(intf->dev.driver);
+				if (!drv->suspend || !drv->resume)
+					usb_forced_unbind_intf(intf);
+			}
 		}
 	}
 }
@@ -1202,7 +1241,7 @@ int usb_resume_complete(struct device *dev)
 	struct usb_device *udev = to_usb_device(dev);
 
 	if (udev->state != USB_STATE_NOTATTACHED)
-		do_rebind_interfaces(udev);
+		rebind_marked_interfaces(udev);
 	return 0;
 }
 
@@ -1232,7 +1271,7 @@ int usb_resume(struct device *dev, pm_message_t msg)
 		pm_runtime_disable(dev);
 		pm_runtime_set_active(dev);
 		pm_runtime_enable(dev);
-		unbind_no_reset_resume_drivers_interfaces(udev);
+		unbind_marked_interfaces(udev);
 	}
 	pm_runtime_put_sync(dev->parent);
 
