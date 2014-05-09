@@ -4,7 +4,7 @@
 
 # Kernel Version
 BASE_VER=".KANGAROO"
-VER=".M7.v044"
+VER=".M7.v045"
 VER=$BASE_VER$VER
 
 # AK Variables
