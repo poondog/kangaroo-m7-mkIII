@@ -218,6 +218,17 @@ static inline void update_cpu_power(unsigned int cpuid, unsigned int mpidr) {}
 #define MPIDR_LEVEL2_MASK 0xFF
 #define MPIDR_LEVEL2_SHIFT 16
 
+/*
+ * cpu topology table
+ */
+struct cputopo_arm cpu_topology[NR_CPUS];
+EXPORT_SYMBOL_GPL(cpu_topology);
+
+const struct cpumask *cpu_coregroup_mask(int cpu)
+{
+	return &cpu_topology[cpu].core_sibling;
+}
+
 void update_siblings_masks(unsigned int cpuid)
 {
 	struct cputopo_arm *cpu_topo, *cpuid_topo = &cpu_topology[cpuid];
@@ -242,17 +253,6 @@ void update_siblings_masks(unsigned int cpuid)
 			cpumask_set_cpu(cpu, &cpuid_topo->thread_sibling);
 	}
 	smp_wmb();
-}
-
-/*
- * cpu topology table
- */
-struct cputopo_arm cpu_topology[NR_CPUS];
-EXPORT_SYMBOL_GPL(cpu_topology);
-
-const struct cpumask *cpu_coregroup_mask(int cpu)
-{
-	return &cpu_topology[cpu].core_sibling;
 }
 
 void store_cpu_topology(unsigned int cpuid)
