@@ -449,12 +449,27 @@ lookup_pi_state(u32 uval, struct futex_hash_bucket *hb,
 		}
 	}
 
+	/*
+	 * We are the first waiter - try to look up the real owner and attach
+	 * the new pi_state to it, but bail out when TID = 0
+	 */
 	if (!pid)
 		return -ESRCH;
 	p = futex_find_get_task(pid);
 	if (!p)
 		return -ESRCH;
 
+	if (!p->mm) {
+		put_task_struct(p);
+		return -EPERM;
+	}
+
+	/*
+	 * We need to look at the task state flags to figure out,
+	 * whether the task is exiting. To protect against the do_exit
+	 * change of the task flags, we do this protected by
+	 * p->pi_lock:
+	 */
 	raw_spin_lock_irq(&p->pi_lock);
 	if (unlikely(p->flags & PF_EXITING)) {
 		int ret = (p->flags & PF_EXITPIDONE) ? -ESRCH : -EAGAIN;
