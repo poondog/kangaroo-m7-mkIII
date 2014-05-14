@@ -97,17 +97,14 @@ static inline int cpuidle_get_last_residency(struct cpuidle_device *dev)
 }
 
 
-/****************************
- * CPUIDLE DRIVER INTERFACE *
- ****************************/
 
 struct cpuidle_driver {
 	const char		*name;
 	struct module 		*owner;
 
-	/* set to 1 to use the core cpuidle time keeping (for all states). */
+	unsigned int		power_specified:1;
+	
 	unsigned int		en_core_tk_irqen:1;
-	/* states array must be ordered in decreasing power consumption */
 	struct cpuidle_state	states[CPUIDLE_STATE_MAX];
 	int			state_count;
 	int			safe_state_index;
