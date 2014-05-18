@@ -11,7 +11,7 @@ VER=$BASE_VER$VER
 export LOCALVERSION=""`echo $VER`
 
 # toolchain
-export CROSS_COMPILE=${HOME}/Toolchains/arm-cortex_a15-linux-gnueabihf-linaro_4.9.1-2014.04/bin/arm-cortex_a15-linux-gnueabihf-
+export CROSS_COMPILE=${HOME}/Toolchains/arm-cortex_a15-linux-gnueabihf-linaro_4.9.1-2014.05/bin/arm-cortex_a15-linux-gnueabihf-
 
 # make .config
 make m7_defconfig
