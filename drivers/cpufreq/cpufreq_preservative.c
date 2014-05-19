@@ -267,12 +267,6 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 	if (!early_suspended) {
 		// apply hysteresis before dropping to lower bus speeds
 		if (freq_table_position < opt_pos) {
-			if (mako_boosted || go_opt) {
-				freq_table_position = opt_pos;  // because the scaling logic may have 
-								// requested something lower
-				go_opt = false;
-			}
-
 			if (++down_requests >= HYSTERESIS) {
 				hyst_flag = true;
 			} else {
