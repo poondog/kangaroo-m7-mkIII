@@ -37,7 +37,6 @@ static void do_dbs_timer(struct work_struct *work);
 
 static int thresh_adj = 0;
 static int opt_pos = OPTIMAL_POSITION;
-extern bool go_opt;
 static unsigned int dbs_enable, down_requests, prev_table_position, freq_table_position, min_sampling_rate;
 bool early_suspended = false;
 bool plug_boost = false;
@@ -284,7 +283,6 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 		}
 
 	} else {
-		go_opt = false;
 		if (freq_table_position > opt_pos)
 				freq_table_position = OPTIMAL_POSITION;  // if early suspended - limit max fq. 
 	}
