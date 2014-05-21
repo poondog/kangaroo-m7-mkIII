@@ -3667,8 +3667,8 @@ static int active_load_balance_cpu_stop(void *data)
 		     !busiest_rq->active_balance))
 		goto out_unlock;
 
-	/* Is there any task to move? */
-	if (busiest_rq->cfs.h_nr_running == 0)
+	
+	if (busiest_rq->nr_running <= 1)
 		goto out_unlock;
 
 	BUG_ON(busiest_rq == target_rq);
