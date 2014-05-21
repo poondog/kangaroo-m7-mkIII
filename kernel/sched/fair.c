@@ -3421,11 +3421,7 @@ find_busiest_queue(struct sched_domain *sd, struct sched_group *group,
 		rq = cpu_rq(i);
 		wl = weighted_cpuload(i);
 
-		/*
-		 * When comparing with imbalance, use weighted_cpuload()
-		 * which is not scaled with the cpu power.
-		 */
-		if (capacity && rq->cfs.h_nr_running == 1 && wl > imbalance)
+		if (capacity && rq->nr_running == 1 && wl > imbalance)
 			continue;
 
 		wl = (wl * SCHED_POWER_SCALE) / power;
