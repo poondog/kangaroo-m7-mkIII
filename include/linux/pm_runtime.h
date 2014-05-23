@@ -200,7 +200,10 @@ static inline void pm_runtime_set_autosuspend_delay(struct device *dev,
 static inline unsigned long pm_runtime_autosuspend_expiration(
 				struct device *dev) { return 0; }
 
-#endif /* !CONFIG_PM_RUNTIME */
+static inline void pm_runtime_update_max_time_suspended(struct device *dev,
+							s64 delta_ns) {}
+
+#endif 
 
 static inline int pm_runtime_idle(struct device *dev)
 {
