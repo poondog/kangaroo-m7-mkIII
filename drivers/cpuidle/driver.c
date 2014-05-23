@@ -39,45 +39,6 @@ static void set_power_states(struct cpuidle_driver *drv)
 		drv->states[i].power_usage = -1 - i;
 }
 
-static void __cpuidle_driver_init(struct cpuidle_driver *drv)
-{
-	drv->refcnt = 0;
-
-	if (!drv->power_specified)
-		set_power_states(drv);
-}
-
-static void cpuidle_set_driver(struct cpuidle_driver *drv)
-{
-	cpuidle_curr_driver = drv;
-}
-
-static int __cpuidle_register_driver(struct cpuidle_driver *drv)
-{
-	if (!drv || !drv->state_count)
-		return -EINVAL;
-
-	if (cpuidle_disabled())
-		return -ENODEV;
-
-	if (cpuidle_get_driver())
-		return -EBUSY;
-
-	__cpuidle_driver_init(drv);
-
-	cpuidle_set_driver(drv);
-
-	return 0;
-}
-
-static void __cpuidle_unregister_driver(struct cpuidle_driver *drv)
-{
-	if (drv != cpuidle_get_driver())
-		return;
-
-	if (!WARN_ON(drv->refcnt > 0))
-		cpuidle_set_driver(NULL);
-}
 
 /**
  * cpuidle_register_driver - registers a driver
@@ -85,14 +46,30 @@ static void __cpuidle_unregister_driver(struct cpuidle_driver *drv)
  */
 int cpuidle_register_driver(struct cpuidle_driver *drv)
 {
-	int ret;
+	if (!drv || !drv->state_count)
+		return -EINVAL;
+
+	if (cpuidle_disabled())
+		return -ENODEV;
 
 	spin_lock(&cpuidle_driver_lock);
-	ret = __cpuidle_register_driver(drv);
+	if (cpuidle_curr_driver) {
+		spin_unlock(&cpuidle_driver_lock);
+		return -EBUSY;
+	}
+
+	if (!drv->power_specified)
+		set_power_states(drv);
+
+	drv->refcnt = 0;
+
+	cpuidle_curr_driver = drv;
+
 	spin_unlock(&cpuidle_driver_lock);
 
-	return ret;
+	return 0;
 }
+
 EXPORT_SYMBOL_GPL(cpuidle_register_driver);
 
 /**
@@ -111,9 +88,11 @@ EXPORT_SYMBOL_GPL(cpuidle_get_driver);
 void cpuidle_unregister_driver(struct cpuidle_driver *drv)
 {
 	spin_lock(&cpuidle_driver_lock);
-	__cpuidle_unregister_driver(drv);
+	if (drv == cpuidle_curr_driver && !WARN_ON(drv->refcnt > 0))
+		cpuidle_curr_driver = NULL;
 	spin_unlock(&cpuidle_driver_lock);
 }
+
 EXPORT_SYMBOL_GPL(cpuidle_unregister_driver);
 
 struct cpuidle_driver *cpuidle_driver_ref(void)
@@ -122,7 +101,7 @@ struct cpuidle_driver *cpuidle_driver_ref(void)
 
 	spin_lock(&cpuidle_driver_lock);
 
-	drv = cpuidle_get_driver();
+	drv = cpuidle_curr_driver;
 	drv->refcnt++;
 
 	spin_unlock(&cpuidle_driver_lock);
@@ -131,7 +110,7 @@ struct cpuidle_driver *cpuidle_driver_ref(void)
 
 void cpuidle_driver_unref(void)
 {
-	struct cpuidle_driver *drv = cpuidle_get_driver();
+	struct cpuidle_driver *drv = cpuidle_curr_driver;
 
 	spin_lock(&cpuidle_driver_lock);
 
