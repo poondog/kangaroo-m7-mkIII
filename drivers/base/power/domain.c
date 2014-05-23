@@ -339,16 +339,19 @@ static void __pm_genpd_restore_device(struct pm_domain_data *pdd,
 {
 	struct generic_pm_domain_data *gpd_data = to_gpd_data(pdd);
 	struct device *dev = pdd->dev;
-	bool need_restore = gpd_data->need_restore;
 
-	gpd_data->need_restore = false;
+	if (!gpd_data->need_restore)
+		return;
+
 	mutex_unlock(&genpd->lock);
 
 	genpd_start_dev(genpd, dev);
-	if (need_restore)
-		genpd_restore_dev(genpd, dev);
+	genpd_restore_dev(genpd, dev);
+	genpd_stop_dev(genpd, dev);
 
 	mutex_lock(&genpd->lock);
+
+	gpd_data->need_restore = false;
 }
 
 /**
@@ -592,7 +595,7 @@ static int pm_genpd_runtime_resume(struct device *dev)
 
 	/* If power.irq_safe, the PM domain is never powered off. */
 	if (dev->power.irq_safe)
-		return genpd_start_dev(genpd, dev);
+		goto out;
 
 	mutex_lock(&genpd->lock);
 	ret = __pm_genpd_poweron(genpd);
@@ -624,6 +627,9 @@ static int pm_genpd_runtime_resume(struct device *dev)
 	genpd_set_active(genpd);
 	wake_up_all(&genpd->status_wait_queue);
 	mutex_unlock(&genpd->lock);
+
+ out:
+	genpd_start_dev(genpd, dev);
 
 	return 0;
 }
