@@ -235,10 +235,16 @@ EXPORT_SYMBOL_GPL(cpuidle_get_driver);
  */
 struct cpuidle_driver *cpuidle_get_cpu_driver(struct cpuidle_device *dev)
 {
+	struct cpuidle_driver *drv;
+
 	if (!dev)
 		return NULL;
 
-	return __cpuidle_get_cpu_driver(dev->cpu);
+	spin_lock(&cpuidle_driver_lock);
+	drv = __cpuidle_get_cpu_driver(dev->cpu);
+	spin_unlock(&cpuidle_driver_lock);
+
+	return drv;
 }
 EXPORT_SYMBOL_GPL(cpuidle_get_cpu_driver);
 
