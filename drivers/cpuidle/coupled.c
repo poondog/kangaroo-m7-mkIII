@@ -408,22 +408,19 @@ static void cpuidle_coupled_set_done(int cpu, struct cpuidle_coupled *coupled)
  * been processed and the poke bit has been cleared.
  *
  * Other interrupts may also be processed while interrupts are enabled, so
- * need_resched() must be tested after this function returns to make sure
+ * need_resched() must be tested after turning interrupts off again to make sure
  * the interrupt didn't schedule work that should take the cpu out of idle.
  *
- * Returns 0 if no poke was pending, 1 if a poke was cleared.
+ * Returns 0 if need_resched was false, -EINTR if need_resched was true.
  */
 static int cpuidle_coupled_clear_pokes(int cpu)
 {
-	if (!cpumask_test_cpu(cpu, &cpuidle_coupled_poke_pending))
-		return 0;
-
 	local_irq_enable();
 	while (cpumask_test_cpu(cpu, &cpuidle_coupled_poke_pending))
 		cpu_relax();
 	local_irq_disable();
 
-	return 1;
+	return need_resched() ? -EINTR : 0;
 }
 
 static bool cpuidle_coupled_any_pokes_pending(struct cpuidle_coupled *coupled)
@@ -467,8 +464,7 @@ int cpuidle_enter_state_coupled(struct cpuidle_device *dev,
 		return -EINVAL;
 
 	while (coupled->prevent) {
-		cpuidle_coupled_clear_pokes(dev->cpu);
-		if (need_resched()) {
+		if (cpuidle_coupled_clear_pokes(dev->cpu)) {
 			local_irq_enable();
 			return entered_state;
 		}
@@ -507,10 +503,7 @@ retry:
 	 */
 	while (!cpuidle_coupled_cpus_waiting(coupled) ||
 			!cpumask_test_cpu(dev->cpu, &cpuidle_coupled_poked)) {
-		if (cpuidle_coupled_clear_pokes(dev->cpu))
-			continue;
-
-		if (need_resched()) {
+		if (cpuidle_coupled_clear_pokes(dev->cpu)) {
 			cpuidle_coupled_set_not_waiting(dev->cpu, coupled);
 			goto out;
 		}
@@ -525,8 +518,7 @@ retry:
 		local_irq_disable();
 	}
 
-	cpuidle_coupled_clear_pokes(dev->cpu);
-	if (need_resched()) {
+	if (cpuidle_coupled_clear_pokes(dev->cpu)) {
 		cpuidle_coupled_set_not_waiting(dev->cpu, coupled);
 		goto out;
 	}
