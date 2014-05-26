@@ -126,14 +126,6 @@ static int __devinit msm_thermal_dev_probe(struct platform_device *pdev)
 		goto fail;
 	WARN_ON(data.sensor_id >= TSENS_MAX_SENSORS);
 
-	key = "qcom,temp-hysteresis";
-	ret = of_property_read_u32(node, key, &data.temp_hysteresis_degC);
-	if (ret)
-		goto fail;
-
-	key = "qcom,freq-step";
-	ret = of_property_read_u32(node, key, &data.freq_step);
-
 fail:
 	if (ret)
 		pr_err("%s: Failed reading node=%s, key=%s\n",
