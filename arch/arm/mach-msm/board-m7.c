@@ -4041,15 +4041,15 @@ static struct msm_thermal_data msm_thermal_pdata = {
 	.shutdown_temp = 79,
 
 	.allowed_max_high = 75,
-	.allowed_max_low = 59,
+	.allowed_max_low = 54,
 	.allowed_max_freq = 486000,
 
-	.allowed_mid_high = 60,
-	.allowed_mid_low = 47,
+	.allowed_mid_high = 55,
+	.allowed_mid_low = 40,
 	.allowed_mid_freq = 918000,
 
-	.allowed_low_high = 50,
-	.allowed_low_low = 40,
+	.allowed_low_high = 43,
+	.allowed_low_low = 34,
 	.allowed_low_freq = 1242000,
 };
 #endif
