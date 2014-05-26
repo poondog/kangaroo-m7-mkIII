@@ -14,7 +14,7 @@ export LOCALVERSION=""`echo $VER`
 export CROSS_COMPILE=${HOME}/Toolchains/arm-cortex_a15-linux-gnueabihf-linaro_4.9.1-2014.05/bin/arm-cortex_a15-linux-gnueabihf-
 
 # make .config
-make m7_defconfig
+make m7wls_defconfig
 env KCONFIG_NOTIMESTAMP=true \
 make ARCH=arm export SUBARCH=arm CROSS_COMPILE=arm-eabi-
 
