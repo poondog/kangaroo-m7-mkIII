@@ -4048,8 +4048,8 @@ static struct msm_thermal_data msm_thermal_pdata = {
 	.allowed_mid_low = 52,
 	.allowed_mid_freq = 918000,
 
-	.allowed_low_high = 48,
-	.allowed_low_low = 44,
+	.allowed_low_high = 46,
+	.allowed_low_low = 43,
 	.allowed_low_freq = 1242000,
 };
 #endif
