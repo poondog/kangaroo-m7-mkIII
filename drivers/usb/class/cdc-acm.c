@@ -1511,14 +1511,30 @@ static const struct usb_device_id acm_ids[] = {
 	{ USB_DEVICE(0x22b8, 0x6425), 
 	},
 	
-	{ USB_DEVICE(0x22b8, 0x2d91) }, 
-	{ USB_DEVICE(0x22b8, 0x2d92) }, 
-	{ USB_DEVICE(0x22b8, 0x2d93) }, 
-	{ USB_DEVICE(0x22b8, 0x2d95) }, 
-	{ USB_DEVICE(0x22b8, 0x2d96) }, 
-	{ USB_DEVICE(0x22b8, 0x2d97) }, 
-	{ USB_DEVICE(0x22b8, 0x2d99) }, 
-	{ USB_DEVICE(0x22b8, 0x2d9a) }, 
+	/* Motorola H24 HSPA module: */
+	{ USB_DEVICE(0x22b8, 0x2d91) }, /* modem                                */
+	{ USB_DEVICE(0x22b8, 0x2d92),   /* modem           + diagnostics        */
+	.driver_info = NO_UNION_NORMAL, /* handle only modem interface          */
+	},
+	{ USB_DEVICE(0x22b8, 0x2d93),   /* modem + AT port                      */
+	.driver_info = NO_UNION_NORMAL, /* handle only modem interface          */
+	},
+	{ USB_DEVICE(0x22b8, 0x2d95),   /* modem + AT port + diagnostics        */
+	.driver_info = NO_UNION_NORMAL, /* handle only modem interface          */
+	},
+	{ USB_DEVICE(0x22b8, 0x2d96),   /* modem                         + NMEA */
+	.driver_info = NO_UNION_NORMAL, /* handle only modem interface          */
+	},
+	{ USB_DEVICE(0x22b8, 0x2d97),   /* modem           + diagnostics + NMEA */
+	.driver_info = NO_UNION_NORMAL, /* handle only modem interface          */
+	},
+	{ USB_DEVICE(0x22b8, 0x2d99),   /* modem + AT port               + NMEA */
+	.driver_info = NO_UNION_NORMAL, /* handle only modem interface          */
+	},
+	{ USB_DEVICE(0x22b8, 0x2d9a),   /* modem + AT port + diagnostics + NMEA */
+	.driver_info = NO_UNION_NORMAL, /* handle only modem interface          */
+	},
+
 
 	{ USB_DEVICE(0x0572, 0x1329), 
 	.driver_info = NO_UNION_NORMAL, 
