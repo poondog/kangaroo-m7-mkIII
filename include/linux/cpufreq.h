@@ -177,9 +177,13 @@ extern void ondemand_boost_cpu(int boost);
 
 extern DEFINE_PER_CPU(int, cpufreq_init_done);
 
+/*********************************************************************
+ *                      CPUFREQ DRIVER INTERFACE                     *
+ *********************************************************************/
 
-#define CPUFREQ_RELATION_L 0  
-#define CPUFREQ_RELATION_H 1  
+#define CPUFREQ_RELATION_L 0  /* lowest frequency at or above target */
+#define CPUFREQ_RELATION_H 1  /* highest frequency below or at target */
+#define CPUFREQ_RELATION_C 2  /* closest frequency to target */
 
 struct freq_attr;
 
