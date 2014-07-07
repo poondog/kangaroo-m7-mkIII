@@ -24,7 +24,16 @@
 #include <linux/of.h>
 #include <mach/cpufreq.h>
 
-#define DEFAULT_TEMP_MAX	85
+#define DEFAULT_TEMP_MAX	75
+
+static unsigned int freq_debug = 1;
+module_param_named(freq_limit_debug, freq_debug, uint, 0644);
+
+#define dprintk(msg...)		\
+do {				\
+	if (freq_debug)		\
+		pr_info(msg);	\
+} while (0)
 
 static unsigned int polling = HZ*2;
 static unsigned int cpu = 0;
@@ -89,7 +98,7 @@ static void check_temp(struct work_struct *work)
 		freq_buffer = freq_max;
 		for_each_possible_cpu(cpu)
 			msm_cpufreq_set_freq_limits(cpu, MSM_CPUFREQ_NO_LIMIT, freq_max);
-		pr_info("msm_thermal: CPU temp: %luC, max: %dMHz, polling: %dms",
+		dprintk("msm_thermal: CPU temp: %luC, max: %dMHz, polling: %dms",
 			temp, freq_max/1000, jiffies_to_msecs(polling));
 	}
 
@@ -104,7 +113,7 @@ int __devinit msm_thermal_init(struct msm_thermal_data *pdata)
 	BUG_ON(pdata->sensor_id >= TSENS_MAX_SENSORS);
 	memcpy(&msm_thermal_info, pdata, sizeof(struct msm_thermal_data));
 
-	pr_info("msm_thermal: Maximum cpu temp: %dC", temp_max);
+	dprintk("msm_thermal: Maximum cpu temp: %dC", temp_max);
 
 	INIT_DELAYED_WORK(&check_temp_work, check_temp);
 	schedule_delayed_work(&check_temp_work, HZ*20);
