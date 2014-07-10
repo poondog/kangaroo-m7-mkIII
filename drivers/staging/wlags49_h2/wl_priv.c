@@ -1738,6 +1738,7 @@ int wvlan_get_netname(struct net_device *dev,
 {
         struct wl_private *lp = wl_priv(dev);
         unsigned long flags;
+	size_t len;
         int         ret = 0;
         int         status = -1;
         wvName_t   *pName;
