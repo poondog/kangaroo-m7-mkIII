@@ -24,6 +24,9 @@
 #include <linux/of.h>
 #include <mach/cpufreq.h>
 
+/* Control interface */
+#define DEFAULT_TEMP_MIN	50
+#define DEFAULT_TEMP_MID	60
 #define DEFAULT_TEMP_MAX	75
 
 static unsigned int freq_debug = 1;
@@ -38,8 +41,15 @@ do {				\
 static unsigned int polling = HZ*2;
 static unsigned int cpu = 0;
 static unsigned int limit_idx;
+
 static unsigned int temp_max = DEFAULT_TEMP_MAX;
 module_param(temp_max, int, 0644);
+
+static unsigned int temp_mid = DEFAULT_TEMP_MIN;
+module_param(temp_mid, int, 0644);
+
+static unsigned int temp_min = DEFAULT_TEMP_MIN;
+module_param(temp_min, int, 0644);
 
 static uint32_t freq_max;
 static uint32_t freq_buffer;
@@ -79,15 +89,15 @@ static void check_temp(struct work_struct *work)
 		freq_max = table[limit_idx - 8].frequency;
 		polling = HZ/8;
 
-	} else if (temp > temp_max - 2) {
+	} else if (temp > temp_mid) {
 		freq_max = table[limit_idx - 5].frequency;
 		polling = HZ/4;
 
-	} else if (temp > temp_max - 5) {
+	} else if (temp > temp_min) {
 		freq_max = table[limit_idx - 2].frequency;
 		polling = HZ/2;
 
-	} else if (temp > temp_max - 10) {
+	} else if (temp > temp_min - 3) {
 		polling = HZ;
 
 	} else {
