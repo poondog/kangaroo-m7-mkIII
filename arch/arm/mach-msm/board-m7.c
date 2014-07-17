@@ -4037,25 +4037,13 @@ static struct platform_device msm_tsens_device = {
 	.id = -1,
 };
 
-#ifdef CONFIG_BRICKED_THERMAL
 static struct msm_thermal_data msm_thermal_pdata = {
 	.sensor_id = 0,
-	.poll_ms = 400,
-	.shutdown_temp = 79,
-
-	.allowed_max_high = 70,
-	.allowed_max_low = 61,
-	.allowed_max_freq = 486000,
-
-	.allowed_mid_high = 57,
-	.allowed_mid_low = 52,
-	.allowed_mid_freq = 918000,
-
-	.allowed_low_high = 46,
-	.allowed_low_low = 43,
-	.allowed_low_freq = 1242000,
+	.poll_ms = 1000,
+	.limit_temp = 51,
+	.temp_hysteresis = 10,
+	.limit_freq = 918000,
 };
-#endif
 
 static int __init check_dq_setup(char *str)
 {
