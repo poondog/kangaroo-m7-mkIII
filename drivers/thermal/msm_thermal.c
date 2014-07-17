@@ -29,7 +29,7 @@
 #define DEFAULT_TEMP_MID	60
 #define DEFAULT_TEMP_MAX	75
 
-static unsigned int freq_debug = 1;
+static unsigned int freq_debug = 0;
 module_param_named(freq_limit_debug, freq_debug, uint, 0644);
 
 #define dprintk(msg...)		\
