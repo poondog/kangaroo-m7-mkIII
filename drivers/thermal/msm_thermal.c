@@ -24,10 +24,16 @@
 #include <linux/of.h>
 #include <mach/cpufreq.h>
 
-/* Control interface */
+/* Control interface
+	-> temperatures in DegC
+	-> CPU will throttle to set freqs at these temps */
 #define DEFAULT_TEMP_MIN	45
 #define DEFAULT_TEMP_MID	55
 #define DEFAULT_TEMP_MAX	70
+
+#define DEFAULT_TEMP_MIN_FREQ	1350000
+#define DEFAULT_TEMP_MID_FREQ	918000
+#define DEFAULT_TEMP_MAX_FREQ	486000
 
 static unsigned int freq_debug = 0;
 module_param_named(freq_limit_debug, freq_debug, uint, 0644);
@@ -44,12 +50,17 @@ static unsigned int limit_idx;
 
 static unsigned int temp_max = DEFAULT_TEMP_MAX;
 module_param(temp_max, int, 0644);
-
 static unsigned int temp_mid = DEFAULT_TEMP_MIN;
 module_param(temp_mid, int, 0644);
-
 static unsigned int temp_min = DEFAULT_TEMP_MIN;
 module_param(temp_min, int, 0644);
+
+static unsigned int temp_max_freq = DEFAULT_TEMP_MAX_FREQ;
+module_param(temp_max_freq, int, 0644);
+static unsigned int temp_mid_freq = DEFAULT_TEMP_MIN_FREQ;
+module_param(temp_mid_freq, int, 0644);
+static unsigned int temp_min_freq = DEFAULT_TEMP_MIN_FREQ;
+module_param(temp_min_freq, int, 0644);
 
 static uint32_t freq_max;
 static uint32_t freq_buffer;
@@ -86,15 +97,15 @@ static void check_temp(struct work_struct *work)
 	tsens_get_temp(&tsens_dev, &temp);
 
 	if (temp > temp_max) {
-		freq_max = table[limit_idx - 8].frequency;
+		freq_max = temp_max_freq;
 		polling = HZ/8;
 
 	} else if (temp > temp_mid) {
-		freq_max = table[limit_idx - 5].frequency;
+		freq_max = temp_mid_freq;
 		polling = HZ/4;
 
 	} else if (temp > temp_min) {
-		freq_max = table[limit_idx - 2].frequency;
+		freq_max = temp_min_freq;
 		polling = HZ/2;
 
 	} else if (temp > temp_min - 3) {
