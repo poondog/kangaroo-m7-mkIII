@@ -25,9 +25,9 @@
 #include <mach/cpufreq.h>
 
 /* Control interface */
-#define DEFAULT_TEMP_MIN	50
-#define DEFAULT_TEMP_MID	60
-#define DEFAULT_TEMP_MAX	75
+#define DEFAULT_TEMP_MIN	45
+#define DEFAULT_TEMP_MID	55
+#define DEFAULT_TEMP_MAX	70
 
 static unsigned int freq_debug = 0;
 module_param_named(freq_limit_debug, freq_debug, uint, 0644);
