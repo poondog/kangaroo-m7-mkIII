@@ -46,7 +46,6 @@ do {				\
 
 static unsigned int polling = HZ*2;
 static unsigned int cpu = 0;
-static unsigned int limit_idx;
 
 static unsigned int temp_max = DEFAULT_TEMP_MAX;
 module_param(temp_max, int, 0644);
@@ -67,28 +66,11 @@ static uint32_t freq_buffer;
 
 static struct msm_thermal_data msm_thermal_info;
 static struct delayed_work check_temp_work;
-static struct cpufreq_frequency_table *table;
-
-static void get_freq_table_limit_idx(void)
-{
-	int i = 0;
-
-	table = cpufreq_frequency_get_table(cpu);
-	while (table[i].frequency != CPUFREQ_TABLE_END)
-		i++;
-
-	limit_idx = i - 1;
-}
 
 static void check_temp(struct work_struct *work)
 {
 	unsigned long temp = 0;
 	struct tsens_device tsens_dev;
-
-	if (!limit_idx)
-		get_freq_table_limit_idx();
-
-	freq_max = table[limit_idx].frequency;
 
 	if (freq_buffer == 0)
 		freq_buffer = freq_max;
