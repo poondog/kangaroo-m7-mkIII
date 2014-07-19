@@ -2472,12 +2472,7 @@ static void sweep2wake_func(int button_id) {
         s2w_time[2] = s2w_time[1];
         s2w_time[1] = s2w_time[0];
         s2w_time[0] = jiffies;
-
-	if (scr_suspended && s2w_hist[0] == 2)
-		s2w_hist[1] = 0;
-	else	
-		s2w_hist[1] = s2w_hist[0];
-        
+	s2w_hist[1] = s2w_hist[0];        
 	s2w_hist[0] = button_id;
 
 	//printk("[S2W]: in func button id 1=%i, button id 2= %i\n", s2w_hist[0], s2w_hist[1]);
