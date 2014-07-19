@@ -2493,7 +2493,7 @@ static void sweep2wake_func(int button_id) {
 
 		} else if ((s2w_hist[1] == 2 && s2w_hist[0] == 1) && !scr_suspended) {
 	        	//printk("[S2W]: ON->OFF\n");
-			//wakesleep_vib = 1;
+			wakesleep_vib = 1;
 			reset_sweep2wake();
 			sweep2wake_pwrtrigger();
 		} else {
