@@ -5644,11 +5644,7 @@ static void __init m7_common_init(void)
 	int rc = 0;
 	struct kobject *properties_kobj;
 
-#ifdef CONFIG_BRICKED_THERMAL
 	msm_thermal_init(&msm_thermal_pdata);
-#else
- 	msm_thermal_device_init();
-#endif
 
 	if (socinfo_init() < 0)
 		pr_err("socinfo_init() failed!\n");
