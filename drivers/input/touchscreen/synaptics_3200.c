@@ -214,7 +214,7 @@ static void syn_handle_block_touch(struct synaptics_ts_data *ts, int enable)
 
 static bool scr_suspended = false;
 static int button_id = 0;
-static int s2w_switch = 2;
+static int s2w_switch = 1;
 static int l2m_switch = 0;
 static int l2w_switch = 0;
 static int dt2w_switch = 2;
