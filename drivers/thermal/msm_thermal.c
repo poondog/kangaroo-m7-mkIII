@@ -35,6 +35,9 @@
 #define DEFAULT_TEMP_MID_FREQ	918000
 #define DEFAULT_TEMP_MAX_FREQ	486000
 
+#define DEFAULT_POWERSAVE_FREQ	1458000
+#define DEFAULT_POWERSAVE	0
+
 static unsigned int freq_debug = 0;
 module_param_named(freq_limit_debug, freq_debug, uint, 0644);
 
@@ -62,6 +65,11 @@ module_param(temp_mid_freq, int, 0644);
 static unsigned int temp_min_freq = DEFAULT_TEMP_MIN_FREQ;
 module_param(temp_min_freq, int, 0644);
 
+static unsigned int powersave_freq = DEFAULT_POWERSAVE_FREQ;
+module_param(powersave_freq, int, 0644);
+static unsigned int powersave = DEFAULT_POWERSAVE;
+module_param(powersave, int, 0644);
+
 static uint32_t freq_max;
 static uint32_t freq_buffer;
 
@@ -73,27 +81,44 @@ static void check_temp(struct work_struct *work)
 	unsigned long temp = 0;
 	struct tsens_device tsens_dev;
 
+	// save the current max freq
 	if (freq_buffer == 0)
 		freq_buffer = freq_max;
 
 	tsens_dev.sensor_num = msm_thermal_info.sensor_id;
 	tsens_get_temp(&tsens_dev, &temp);
 
+	// powersave
+	if (powersave == 1 && throttled == 0) {
+		freq_max = powersave_freq;
+		throttled = 0;
+		polling = HZ*2;
+
+	// powersave turned off
+	} else if (powersave == 0 && throttled == 0) {
+		freq_max = 1728000;
+		goto steps;
+	}
+steps:
+	// thermal step 3
 	if (temp > temp_max) {
 		freq_max = temp_max_freq;
 		throttled = 1;
 		polling = HZ/8;
 
+	// thermal step 2
 	} else if (temp > temp_mid) {
 		freq_max = temp_mid_freq;
 		throttled = 1;
 		polling = HZ/4;
 
+	// thermal step 1
 	} else if (temp > temp_min) {
 		freq_max = temp_min_freq;
 		throttled = 1;
 		polling = HZ/2;
 
+	// when temp is nearing thermal step 1, be ready
 	} else if (temp > temp_min - 3) {
 		throttled = 0;
 		polling = HZ;
