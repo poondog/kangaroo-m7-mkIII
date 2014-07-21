@@ -56,14 +56,14 @@ static unsigned int throttled;
 
 static unsigned int temp_max = DEFAULT_TEMP_MAX;
 module_param(temp_max, int, 0644);
-static unsigned int temp_mid = DEFAULT_TEMP_MIN;
+static unsigned int temp_mid = DEFAULT_TEMP_MID;
 module_param(temp_mid, int, 0644);
 static unsigned int temp_min = DEFAULT_TEMP_MIN;
 module_param(temp_min, int, 0644);
 
 static unsigned int temp_max_freq = DEFAULT_TEMP_MAX_FREQ;
 module_param(temp_max_freq, int, 0644);
-static unsigned int temp_mid_freq = DEFAULT_TEMP_MIN_FREQ;
+static unsigned int temp_mid_freq = DEFAULT_TEMP_MID_FREQ;
 module_param(temp_mid_freq, int, 0644);
 static unsigned int temp_min_freq = DEFAULT_TEMP_MIN_FREQ;
 module_param(temp_min_freq, int, 0644);
