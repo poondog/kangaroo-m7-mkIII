@@ -99,7 +99,7 @@ static void check_temp(struct work_struct *work)
 
 	// powersave turned off
 	} else if (powersave == 0 && throttled == 0) {
-		freq_max = 1728000;
+		freq_max = MSM_CPUFREQ_NO_LIMIT;
 		goto steps;
 	}
 steps:
