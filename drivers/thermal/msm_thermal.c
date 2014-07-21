@@ -46,6 +46,7 @@ do {				\
 
 static unsigned int polling = HZ*2;
 static unsigned int cpu = 0;
+static unsigned int throttled;
 
 static unsigned int temp_max = DEFAULT_TEMP_MAX;
 module_param(temp_max, int, 0644);
@@ -80,20 +81,25 @@ static void check_temp(struct work_struct *work)
 
 	if (temp > temp_max) {
 		freq_max = temp_max_freq;
+		throttled = 1;
 		polling = HZ/8;
 
 	} else if (temp > temp_mid) {
 		freq_max = temp_mid_freq;
+		throttled = 1;
 		polling = HZ/4;
 
 	} else if (temp > temp_min) {
 		freq_max = temp_min_freq;
+		throttled = 1;
 		polling = HZ/2;
 
 	} else if (temp > temp_min - 3) {
+		throttled = 0;
 		polling = HZ;
 
 	} else {
+		throttled = 0;
 		polling = HZ*2;
 	}
 
