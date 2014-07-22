@@ -3,7 +3,10 @@
  * Copyright (C) 2011 HTC Corporation.
  *
  * Sweep2wake and Doubletap2wake with pocket detection for HTC One
- * Copyright (C) 2013 Aaron Segaert aka flar2 (asegaert at gmail.com)  
+ * Copyright (C) 2013 Aaron Segaert aka flar2 (asegaert at gmail.com)
+ *
+ * Butchered for support for bi directional and some tweaks
+ * Copyright (C) 2014, Poondog <markj338@gmail.com>
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -399,100 +402,7 @@ void logo2wake_longtap_count_trigger(void)
 	}
         return;
 }
-
-static int __init get_s2w_opt(char *s2w)
-{
-	if (strcmp(s2w, "0") == 0) {
-		s2w_switch = 0;
-	} else if (strcmp(s2w, "1") == 0) {
-		s2w_switch = 1;
-	} else if (strcmp(s2w, "2") == 0) {
-		s2w_switch = 2;
-	} else {
-		s2w_switch = 0;
-	}
-	return 1;
-}
-
-__setup("s2w=", get_s2w_opt); 
-
-
-static int __init get_l2m_opt(char *l2m)
-{
-	if (strcmp(l2m, "0") == 0) {
-		l2m_switch = 0;
-	} else if (strcmp(l2m, "1") == 0) {
-		l2m_switch = 1;
-	} else {
-		l2m_switch = 0;
-	}
-	return 1;
-}
-
-__setup("l2m=", get_l2m_opt); 
-
-static int __init get_l2w_opt(char *l2w)
-{
-	if (strcmp(l2w, "0") == 0) {
-		l2w_switch = 0;
-	} else if (strcmp(l2w, "1") == 0) {
-		l2w_switch = 1;
-	} else {
-		l2w_switch = 0;
-	}
-	return 1;
-}
-
-__setup("l2w=", get_l2w_opt); 
-
-static int __init get_pocket_detect_opt(char *pd)
-{
-	if (strcmp(pd, "0") == 0) {
-		pocket_detect = 0;
-	} else if (strcmp(pd, "1") == 0) {
-		pocket_detect = 1;
-	} else {
-		pocket_detect = 0;
-	}
-	return 1;
-}
-
-__setup("pd=", get_pocket_detect_opt); 
-
-static int __init get_dt2w_opt(char *dt2w)
-{
-	if (strcmp(dt2w, "0") == 0) {
-		dt2w_switch = 0;
-	} else if (strcmp(dt2w, "1") == 0) {
-		dt2w_switch = 1;
-	} else if (strcmp(dt2w, "2") == 0) {
-		dt2w_switch = 2;
-	} else {
-		dt2w_switch = 0;
-	}
-	return 1;
-}
-
-__setup("dt2w=", get_dt2w_opt); 
-
-
-static int __init get_vib_opt(char *vib)
-{
-	if (strcmp(vib, "0") == 0) {
-		vib_strength = 0;
-	} else if (strcmp(vib, "1") == 0) {
-		vib_strength = 15;
-	} else if (strcmp(vib, "2") == 0) {
-		vib_strength = 30;
-	} else {
-		vib_strength = 15;
-	}
-	return 1;
-}
-
-__setup("vib=", get_vib_opt);
-
-#endif
+#endif //sweep2wake
 
 static void syn_page_select(struct i2c_client *client, uint8_t page)
 {
