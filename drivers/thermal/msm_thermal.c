@@ -106,13 +106,13 @@ steps:
 	// thermal step 3
 	if (temp > temp_max) {
 		freq_max = temp_max_freq;
-		throttled = 1;
+		throttled = 3;
 		polling = HZ/8;
 
 	// thermal step 2
 	} else if (temp > temp_mid) {
 		freq_max = temp_mid_freq;
-		throttled = 1;
+		throttled = 2;
 		polling = HZ/4;
 
 	// thermal step 1
