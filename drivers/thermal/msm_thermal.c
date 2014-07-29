@@ -106,19 +106,19 @@ static void check_temp(struct work_struct *work)
 	}
 steps:
 	// thermal step 3
-	if (temp > temp_max) {
+	if (temp >= temp_max) {
 		freq_max = temp_max_freq;
 		throttled = 1;
 		polling = HZ/8;
 
 	// thermal step 2
-	} else if (temp > temp_mid) {
+	} else if (temp >= temp_mid) {
 		freq_max = temp_mid_freq;
 		throttled = 1;
 		polling = HZ/4;
 
 	// thermal step 1
-	} else if (temp > temp_min) {
+	} else if (temp >= temp_min) {
 		freq_max = temp_min_freq;
 		throttled = 1;
 		polling = HZ/2;
