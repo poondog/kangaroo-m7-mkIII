@@ -32,9 +32,9 @@
  * -> when temp_min is reached, temp_min_freq will take over
  * -> if powersave is not active then thermal will behave as normal 
  */
-#define DEFAULT_TEMP_MIN	45
-#define DEFAULT_TEMP_MID	55
-#define DEFAULT_TEMP_MAX	70
+#define DEFAULT_TEMP_MIN	43
+#define DEFAULT_TEMP_MID	54
+#define DEFAULT_TEMP_MAX	65
 
 #define DEFAULT_TEMP_MIN_FREQ	1350000
 #define DEFAULT_TEMP_MID_FREQ	918000
