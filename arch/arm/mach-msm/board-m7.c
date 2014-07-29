@@ -4040,9 +4040,6 @@ static struct platform_device msm_tsens_device = {
 static struct msm_thermal_data msm_thermal_pdata = {
 	.sensor_id = 0,
 	.poll_ms = 500,
-	/*.limit_temp = 51,
-	.temp_hysteresis = 10,
-	.limit_freq = 918000,*/
 };
 
 static int __init check_dq_setup(char *str)
