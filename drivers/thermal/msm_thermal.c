@@ -177,7 +177,7 @@ static int __devinit msm_thermal_dev_probe(struct platform_device *pdev)
 fail:
 	if (ret)
 		pr_err("%s: Failed reading node=%s, key=%s\n",
-		       __func__, node->full_name, key);
+			__func__, node->full_name, key);
 	else
 		ret = msm_thermal_init(&data);
 
