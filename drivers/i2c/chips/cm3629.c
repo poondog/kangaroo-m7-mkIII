@@ -669,8 +669,8 @@ static void report_lsensor_input_event(struct cm3629_info *lpi, int resume)
 			adc_value = adc_value*4;
 		else
 			adc_value = adc_value*8;
-                if (adc_value > 0xFFFF)
-                        adc_value = 0xFFFF;
+		if (adc_value > 0xFFFF)
+			adc_value = 0xFFFF;
 	}
 	for (i = 0; i < 10; i++) {
 		if (adc_value <= (*(lpi->adc_table + i))) {
@@ -698,7 +698,7 @@ static void report_lsensor_input_event(struct cm3629_info *lpi, int resume)
 			__func__, adc_value, level, *(lpi->cali_table + (i - 1)) + 1, *(lpi->cali_table + i), lightsensor_cali);
 	current_lightsensor_adc = adc_value;
 	lpi->current_level = level;
-        lpi->current_adc = adc_value;
+	lpi->current_adc = adc_value;
 	if(lpi->ws_calibrate)
 		lpi->current_adc = w_adc_value;
 
@@ -804,8 +804,8 @@ static void sensor_irq_do_work(struct work_struct *work)
 			__func__, add);
 			inter_error++ ;
 		} else {
-                	pr_err("[PS][cm3629 error]%s error: unkown interrupt: 0x%x!\n",
-	                __func__, add);
+			pr_err("[PS][cm3629 error]%s error: unkown interrupt: 0x%x!\n",
+			__func__, add);
 		}
 	}
 	enable_irq(lpi->irq);
@@ -997,7 +997,7 @@ static void polling_do_work(struct work_struct *w)
 			cmd[1] = lpi->ps1_thd_set + 1;
 		else
 			cmd[1] = lpi->ps1_thd_set + lpi->ps1_thh_diff;
-                if (cmd[1] < cmd[0])
+		if (cmd[1] < cmd[0])
 			cmd[1] = cmd[0];
 
 		_cm3629_I2C_Write2(lpi->cm3629_slave_address,
@@ -1728,7 +1728,7 @@ static ssize_t ps_kadc_store(struct device *dev,
 	struct cm3629_info *lpi = lp_info;
 	uint8_t ps_conf1_val;
 #ifdef CONFIG_PSENSOR_KTHRESHOLD
-        char cmd[2];
+	char cmd[2];
 #endif
 	sscanf(buf, "0x%x 0x%x", &param1, &param2);
 	D("[PS][cm3629]%s: store value = 0x%X, 0x%X\n", __func__, param1, param2);
@@ -1801,12 +1801,12 @@ static ssize_t ps_kadc_store(struct device *dev,
 #ifdef CONFIG_PSENSOR_KTHRESHOLD
 	lpi->ps1_thd_set = lpi->inte_ps2_canc;
 	cmd[0] = lpi->ps1_thd_set;
-        if (lpi->ps1_thh_diff == 0)
-                cmd[1] = lpi->ps1_thd_set + 1;
-        else
-                cmd[1] = lpi->ps1_thd_set + lpi->ps1_thh_diff;
-        _cm3629_I2C_Write2(lpi->cm3629_slave_address,
-                PS_1_thd, cmd, 3);
+	if (lpi->ps1_thh_diff == 0)
+		cmd[1] = lpi->ps1_thd_set + 1;
+	else
+		cmd[1] = lpi->ps1_thd_set + lpi->ps1_thh_diff;
+	_cm3629_I2C_Write2(lpi->cm3629_slave_address,
+		PS_1_thd, cmd, 3);
 #endif
 	D("[PS]%s: inte_ps1_canc = 0x%02X, inte_ps2_canc = 0x%02X, lpi->ps_conf1_val  = 0x%02X\n",
 	  __func__, lpi->inte_ps1_canc, lpi->inte_ps2_canc, lpi->ps_conf1_val);
@@ -2175,7 +2175,7 @@ static ssize_t ls_kadc_store(struct device *dev,
 		lpi->als_gadc = lpi->golden_adc;
 		printk(KERN_INFO "[LS]%s: als_kadc=0x%x, als_gadc=0x%x\n",
 				__func__, lpi->als_kadc, lpi->als_gadc);
-	        if (lightsensor_update_table(lpi) < 0)
+		if (lightsensor_update_table(lpi) < 0)
 			printk(KERN_ERR "[LS][cm3629 error] %s: update ls table fail\n", __func__);
 	}
 
@@ -2367,7 +2367,7 @@ static ssize_t phone_status_store(struct device *dev,
 	phone_status = phone_status1;
 
 
-        D("[PS][cm3629] %s: phone_status = %d\n", __func__, phone_status);
+	D("[PS][cm3629] %s: phone_status = %d\n", __func__, phone_status);
 	if (phone_status == 0)
 		oncall = 0;
 	else
@@ -2440,7 +2440,7 @@ static ssize_t ls_dark_level_store(struct device *dev,
 	lpi->dark_level = (uint8_t) ls_dark_level;
 
 	D("[LS] %s: LS_dark_level = %d\n",
-          __func__, lpi->dark_level);
+	  __func__, lpi->dark_level);
 
 	return count;
 }
@@ -2710,9 +2710,9 @@ static void cm3629_late_resume(struct early_suspend *h)
 #if 0
 static void release_psensor_wakelock_handler(void)
 {
-        struct cm3629_info *lpi = lp_info;
+	struct cm3629_info *lpi = lp_info;
 	wake_unlock(&lpi->ps_wake_lock);
-        D("[PS][cm3629] %s\n", __func__);
+	D("[PS][cm3629] %s\n", __func__);
 }
 #endif
 static int cm3629_probe(struct i2c_client *client,
@@ -2843,7 +2843,7 @@ static int cm3629_probe(struct i2c_client *client,
 	psensor_set_kvalue(lpi);
 	pocket_thd = lpi->ps1_thd_set;
 	if (lpi->dynamical_threshold == 1) {
-	        lpi->ps1_thd_set = lpi->ps1_thd_set + 50;
+		lpi->ps1_thd_set = lpi->ps1_thd_set + 50;
 		lpi->original_ps_thd_set = lpi->ps1_thd_set;
 		pocket_thd = lpi->ps1_thd_set;
 	}
