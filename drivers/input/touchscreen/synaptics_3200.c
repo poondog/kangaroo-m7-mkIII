@@ -227,7 +227,7 @@ static unsigned long s2w_time[3] = {0, 0, 0};
 static unsigned long l2m_time[2] = {0, 0};
 static unsigned long pwrtrigger_time[2] = {0, 0};
 static int wakesleep_vib = 0;
-static int vib_strength = 20;
+static int vib_strength = 18;
 static int break_longtap_count = 0;
 
 static struct wake_lock l2w_wakelock;
