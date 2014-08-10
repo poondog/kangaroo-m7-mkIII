@@ -20,7 +20,11 @@
 #define KGSL_PWRLEVEL_NOMINAL 1
 #define KGSL_PWRLEVEL_LAST_OFFSET 2
 
+#ifdef CONFIG_GPU_OVERCLOCK
+#define KGSL_MAX_CLKS 6
+#else
 #define KGSL_MAX_CLKS 5
+#endif
 
 struct platform_device;
 
