@@ -268,38 +268,38 @@ int ip_dont_fragment(struct sock *sk, struct dst_entry *dst)
                  !(dst_metric_locked(dst, RTAX_MTU)));
 }
 
-extern void __ip_select_ident(struct iphdr *iph, struct dst_entry *dst, int more);
+u32 ip_idents_reserve(u32 hash, int segs);
+void __ip_select_ident(struct iphdr *iph, int segs);
 
-static inline void ip_select_ident(struct sk_buff *skb, struct dst_entry *dst, struct sock *sk)
-{
-        struct iphdr *iph = ip_hdr(skb);
-
-        if ((iph->frag_off & htons(IP_DF)) && !skb->local_df) {
-                /* This is only to work around buggy Windows95/2000
-                 * VJ compression implementations.  If the ID field
-                 * does not change, they drop every other packet in
-                 * a TCP stream using header compression.
-                 */
-                iph->id = (sk && inet_sk(sk)->inet_daddr) ?
-                                        htons(inet_sk(sk)->inet_id++) : 0;
-        } else
-                __ip_select_ident(iph, dst, 0);
-}
-
-static inline void ip_select_ident_more(struct sk_buff *skb, struct dst_entry *dst, struct sock *sk, int more)
+static inline void ip_select_ident_segs(struct sk_buff *skb, struct sock *sk, int segs)
 {
 	struct iphdr *iph = ip_hdr(skb);
 
 	if ((iph->frag_off & htons(IP_DF)) && !skb->local_df) {
+		/* This is only to work around buggy Windows95/2000
+		 * VJ compression implementations.  If the ID field
+		 * does not change, they drop every other packet in
+		 * a TCP stream using header compression.
+		 */
 		if (sk && inet_sk(sk)->inet_daddr) {
 			iph->id = htons(inet_sk(sk)->inet_id);
-			inet_sk(sk)->inet_id += 1 + more;
-		} else
+			inet_sk(sk)->inet_id += segs;
+		} else {
 			iph->id = 0;
-	} else
-		__ip_select_ident(iph, dst, more);
+		}
+	} else {
+		__ip_select_ident(iph, segs);
+	}
 }
 
+static inline void ip_select_ident(struct sk_buff *skb, struct sock *sk)
+{
+	ip_select_ident_segs(skb, sk, 1);
+}
+
+/*
+ *	Map a multicast IP onto multicast MAC for type ethernet.
+ */
 
 static inline void ip_eth_mc_map(__be32 naddr, char *buf)
 {
@@ -314,6 +314,10 @@ static inline void ip_eth_mc_map(__be32 naddr, char *buf)
 	buf[3]=addr&0x7F;
 }
 
+/*
+ *	Map a multicast IP onto multicast MAC for type IP-over-InfiniBand.
+ *	Leave P_Key as 0 to be filled in by driver.
+ */
 
 static inline void ip_ib_mc_map(__be32 naddr, const unsigned char *broadcast, char *buf)
 {
