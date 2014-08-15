@@ -1333,9 +1333,10 @@ static void snd_usbmidi_rawmidi_free(struct snd_rawmidi *rmidi)
 static struct snd_rawmidi_substream *snd_usbmidi_find_substream(struct snd_usb_midi* umidi,
 								int stream, int number)
 {
-	struct snd_rawmidi_substream *substream;
+	struct list_head* list;
 
-	list_for_each_entry(substream, &umidi->rmidi->streams[stream].substreams, list) {
+	list_for_each(list, &umidi->rmidi->streams[stream].substreams) {
+		struct snd_rawmidi_substream *substream = list_entry(list, struct snd_rawmidi_substream, list);
 		if (substream->number == number)
 			return substream;
 	}
